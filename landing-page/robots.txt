@@ -1,0 +1,23 @@
+# BoatCheckPro - robots.txt
+# Controla cómo los motores de búsqueda indexan el sitio
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /temp/
+Disallow: /*.pdf$
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+
+# Sitemap location
+Sitemap: https://boatcheckpro.com/sitemap.xml
+
+# Crawl delay (respeta el servidor)
+Crawl-delay: 1
