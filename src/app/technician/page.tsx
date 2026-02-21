@@ -1,6 +1,6 @@
 'use client'
 
-import { Star, MapPin, Award, Clock, Users, CheckCircle, Calendar } from 'lucide-react'
+import { Star, MapPin, Award, Clock, Users, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 
 export default function TechnicianProfilePage() {
