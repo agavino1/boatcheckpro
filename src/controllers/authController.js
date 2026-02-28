@@ -75,8 +75,9 @@ export const login = async (req, res, next) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    if (!user.emailVerified) {
-      return res.status(403).json({ 
+    const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASSWORD;
+    if (!user.emailVerified && emailConfigured) {
+      return res.status(403).json({
         error: 'Please verify your email first',
         userId: user.id,
       });
