@@ -65,7 +65,6 @@ jobs:
             --max-instances 10 \
             --set-env-vars "\
               NODE_ENV=production,\
-              PORT=8080,\
               DATABASE_URL=${{ secrets.DATABASE_URL }},\
               JWT_SECRET=${{ secrets.JWT_SECRET }},\
               STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }},\
