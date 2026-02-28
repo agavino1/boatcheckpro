@@ -134,6 +134,6 @@ export const es = {
     label: 'Tema',
     themes: { light: 'Claro', dark: 'Oscuro', cupcake: 'Cupcake', business: 'Business', cyberpunk: 'Cyberpunk', forest: 'Bosque' },
   },
-} as const
+}
 
 export type Translations = typeof es
