@@ -29,7 +29,11 @@ export const register = async (req, res, next) => {
       emailVerificationExpiry: verificationExpiry,
     });
 
-    await sendVerificationEmail(email, firstName, verificationToken);
+    try {
+      await sendVerificationEmail(email, firstName, verificationToken);
+    } catch (emailErr) {
+      console.warn('Email sending skipped (no SMTP config):', emailErr.message);
+    }
 
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
