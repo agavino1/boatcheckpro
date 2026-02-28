@@ -15,7 +15,7 @@ export default function Footer() {
               <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
                 <Anchor className="w-6 h-6 text-primary-content" />
               </div>
-              <span className="font-bold text-neutral-content">BoatCheckPro</span>
+              <span className="font-bold text-neutral-content">CheckThatBoat</span>
             </div>
             <p className="text-sm text-neutral-content/70">{t.footer.tagline}</p>
           </div>

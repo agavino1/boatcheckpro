@@ -52,7 +52,7 @@ export default function Navbar() {
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
               <Anchor className="w-6 h-6 text-primary-content" />
             </div>
-            <span className="gradient-text">BoatCheckPro</span>
+            <span className="gradient-text">CheckThatBoat</span>
           </Link>
 
           {/* Desktop Menu */}

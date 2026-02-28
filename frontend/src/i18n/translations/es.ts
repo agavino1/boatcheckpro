@@ -36,7 +36,7 @@ export const es = {
     step4Title: 'Completado y Verificado',
     step4Desc: 'Tu inspección es oficial y puede usarse para seguros, ventas, financiación o tranquilidad personal.',
     step: 'Paso',
-    whyTitle: '¿Por Qué Elegir BoatCheckPro?',
+    whyTitle: '¿Por Qué Elegir CheckThatBoat?',
     b1t: 'Entrega Rápida', b1d: 'Informes entregados en 24 horas',
     b2t: 'Técnicos Expertos', b2d: 'Profesionales marinos certificados con +10 años de experiencia',
     b3t: 'Precios Transparentes', b3d: 'Sin tarifas ocultas, precios claros por adelantado',
@@ -78,7 +78,7 @@ export const es = {
   },
   faq: {
     title: 'Preguntas Frecuentes',
-    subtitle: 'Todo lo que necesitas saber sobre BoatCheckPro',
+    subtitle: 'Todo lo que necesitas saber sobre CheckThatBoat',
     stillQ: '¿Aún tienes preguntas?',
     stillDesc: 'Nuestro equipo de soporte está disponible 24/7 para ayudarte',
     email: 'Envíanos un email',
@@ -106,11 +106,11 @@ export const es = {
     features: 'Características', pricing: 'Precios', security: 'Seguridad',
     about: 'Sobre Nosotros', blog: 'Blog', contact: 'Contacto',
     privacy: 'Política de Privacidad', terms: 'Términos de Servicio', cookies: 'Política de Cookies',
-    rights: '© 2026 BoatCheckPro. Todos los derechos reservados.',
+    rights: '© 2026 CheckThatBoat. Todos los derechos reservados.',
   },
   auth: {
     login: {
-      title: 'BoatCheckPro', subtitle: 'Bienvenido de vuelta',
+      title: 'CheckThatBoat', subtitle: 'Bienvenido de vuelta',
       email: 'Correo Electrónico', emailPlaceholder: 'tu@ejemplo.com',
       password: 'Contraseña', forgotPassword: '¿Olvidaste tu contraseña?',
       submit: 'Iniciar Sesión', submitting: 'Iniciando sesión…',
@@ -118,7 +118,7 @@ export const es = {
       backHome: 'Volver al inicio', orWith: 'O continúa con',
     },
     register: {
-      title: 'Únete a BoatCheckPro', subtitle: 'Empieza en minutos',
+      title: 'Únete a CheckThatBoat', subtitle: 'Empieza en minutos',
       firstName: 'Nombre', firstPlaceholder: 'Juan',
       lastName: 'Apellidos', lastPlaceholder: 'García',
       email: 'Correo Electrónico', emailPlaceholder: 'tu@ejemplo.com',

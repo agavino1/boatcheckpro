@@ -38,7 +38,7 @@ export const en: Translations = {
     step4Title: 'Complete & Verified',
     step4Desc: 'Your inspection is official and can be used for insurance, sales, financing, or personal peace of mind.',
     step: 'Step',
-    whyTitle: 'Why Choose BoatCheckPro?',
+    whyTitle: 'Why Choose CheckThatBoat?',
     b1t: 'Fast Turnaround', b1d: 'Reports delivered within 24 hours',
     b2t: 'Expert Technicians', b2d: 'Certified marine professionals with 10+ years experience',
     b3t: 'Transparent Pricing', b3d: 'No hidden fees, clear upfront pricing',
@@ -80,7 +80,7 @@ export const en: Translations = {
   },
   faq: {
     title: 'Frequently Asked Questions',
-    subtitle: 'Everything you need to know about BoatCheckPro',
+    subtitle: 'Everything you need to know about CheckThatBoat',
     stillQ: 'Still have questions?',
     stillDesc: 'Our support team is available 24/7 to help you',
     email: 'Email Us',
@@ -108,11 +108,11 @@ export const en: Translations = {
     features: 'Features', pricing: 'Pricing', security: 'Security',
     about: 'About Us', blog: 'Blog', contact: 'Contact',
     privacy: 'Privacy Policy', terms: 'Terms of Service', cookies: 'Cookie Policy',
-    rights: '© 2026 BoatCheckPro. All rights reserved.',
+    rights: '© 2026 CheckThatBoat. All rights reserved.',
   },
   auth: {
     login: {
-      title: 'BoatCheckPro', subtitle: 'Welcome back',
+      title: 'CheckThatBoat', subtitle: 'Welcome back',
       email: 'Email Address', emailPlaceholder: 'you@example.com',
       password: 'Password', forgotPassword: 'Forgot password?',
       submit: 'Sign In', submitting: 'Signing in…',
@@ -120,7 +120,7 @@ export const en: Translations = {
       backHome: 'Back to home', orWith: 'Or continue with',
     },
     register: {
-      title: 'Join BoatCheckPro', subtitle: 'Get started in minutes',
+      title: 'Join CheckThatBoat', subtitle: 'Get started in minutes',
       firstName: 'First Name', firstPlaceholder: 'John',
       lastName: 'Last Name', lastPlaceholder: 'Doe',
       email: 'Email Address', emailPlaceholder: 'you@example.com',

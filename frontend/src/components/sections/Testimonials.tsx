@@ -4,10 +4,10 @@ import { Star } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 const testimonialsData = [
-  { id: 1, name: 'Captain James Mitchell', role: 'Sailboat Owner, 15 years', text: 'BoatCheckPro gave me complete peace of mind. The detailed report was incredibly thorough and helped me schedule preventative maintenance before issues became problems.', rating: 5, initials: 'JM', color: 'bg-blue-500' },
+  { id: 1, name: 'Captain James Mitchell', role: 'Sailboat Owner, 15 years', text: 'CheckThatBoat gave me complete peace of mind. The detailed report was incredibly thorough and helped me schedule preventative maintenance before issues became problems.', rating: 5, initials: 'JM', color: 'bg-blue-500' },
   { id: 2, name: 'Sarah Chen', role: 'Yacht Buyer, First-time', text: 'I was nervous about my first boat purchase. The inspection report was so detailed and professional - it caught issues I would have missed. Worth every penny.', rating: 5, initials: 'SC', color: 'bg-purple-500' },
-  { id: 3, name: 'Michael Rodriguez', role: 'Insurance Agent', text: 'My clients love that BoatCheckPro reports are accepted by all major insurers. It streamlines the valuation process significantly.', rating: 5, initials: 'MR', color: 'bg-green-500' },
-  { id: 4, name: 'Dr. Patricia Watson', role: 'Marina Manager', text: 'We recommend BoatCheckPro to all our boat owners. The technicians are professional, punctual, and thorough. Always excellent service.', rating: 5, initials: 'PW', color: 'bg-pink-500' },
+  { id: 3, name: 'Michael Rodriguez', role: 'Insurance Agent', text: 'My clients love that CheckThatBoat reports are accepted by all major insurers. It streamlines the valuation process significantly.', rating: 5, initials: 'MR', color: 'bg-green-500' },
+  { id: 4, name: 'Dr. Patricia Watson', role: 'Marina Manager', text: 'We recommend CheckThatBoat to all our boat owners. The technicians are professional, punctual, and thorough. Always excellent service.', rating: 5, initials: 'PW', color: 'bg-pink-500' },
   { id: 5, name: 'David Thompson', role: 'Fishing Boat Operator', text: "Fast service, accurate reports, and great support. I've used them multiple times for my commercial vessel maintenance checks.", rating: 5, initials: 'DT', color: 'bg-indigo-500' },
   { id: 6, name: 'Elena Rossi', role: 'Yacht Club Director', text: 'The premium inspection package is excellent for our club members. Professional, comprehensive, and the reports look fantastic.', rating: 5, initials: 'ER', color: 'bg-orange-500' },
 ]

@@ -10,7 +10,7 @@ import Footer from '@/components/layout/Footer'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'BoatCheckPro - Professional Boat Inspection Platform',
+  title: 'CheckThatBoat - Professional Boat Inspection Platform',
   description:
     'Streamline your boat inspection process with our professional SaaS platform. Fast, reliable, and transparent inspection reports.',
 }
