@@ -1,9 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   LineChart,
   Line,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
@@ -24,8 +22,9 @@ import KPICard from '../components/KPICard';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
 import { mockDashboardStats, mockInspections, mockPayments } from '../lib/mockData';
 import { formatCurrency, formatDate } from '../utils/export';
+import { fetchDashboard, fetchInspections, type DashboardStats, type AdminInspection } from '../lib/api';
 
-// Monthly revenue data
+// Monthly revenue data (static chart data)
 const monthlyRevenueData = [
   { month: 'Ene', revenue: 3200 },
   { month: 'Feb', revenue: 3800 },
@@ -41,8 +40,8 @@ const monthlyRevenueData = [
   { month: 'Dic', revenue: 5000 },
 ];
 
-// Inspections by status
-const inspectionStatusData = [
+// Inspections by status (will be updated with real data)
+const defaultStatusData = [
   { name: 'Completadas', value: 287, color: '#10b981' },
   { name: 'En progreso', value: 45, color: '#f59e0b' },
   { name: 'Pendientes', value: 52, color: '#3b82f6' },
@@ -50,15 +49,40 @@ const inspectionStatusData = [
 ];
 
 export default function Dashboard() {
-  const totalRevenue = mockDashboardStats.totalRevenue;
-  const totalInspections = mockDashboardStats.totalInspections;
-  const activeTechnicians = mockDashboardStats.activeTechnicians;
-  const completionRate = mockDashboardStats.completionRate;
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentInspections, setRecentInspections] = useState(mockInspections.slice(0, 5));
+  const [inspectionStatusData, setInspectionStatusData] = useState(defaultStatusData);
+  const [loading, setLoading] = useState(true);
 
-  // Recent inspections
-  const recentInspections = mockInspections.slice(0, 5);
+  useEffect(() => {
+    Promise.all([
+      fetchDashboard().catch(() => null),
+      fetchInspections().catch(() => [] as AdminInspection[]),
+    ]).then(([dashData, inspData]) => {
+      if (dashData) setStats(dashData);
 
-  // Recent payments
+      if (inspData && inspData.length > 0) {
+        // Build status chart from real data
+        const statusCounts: Record<string, number> = {};
+        inspData.forEach((i) => { statusCounts[i.status] = (statusCounts[i.status] || 0) + 1; });
+        const colorMap: Record<string, string> = {
+          completada: '#10b981', 'en-progreso': '#f59e0b', pendiente: '#3b82f6', cancelada: '#ef4444', confirmada: '#6366f1',
+        };
+        setInspectionStatusData(
+          Object.entries(statusCounts).map(([name, value]) => ({
+            name, value, color: colorMap[name] ?? '#9ca3af',
+          }))
+        );
+      }
+    }).finally(() => setLoading(false));
+  }, []);
+
+  const totalRevenue = stats?.totalRevenue ?? mockDashboardStats.totalRevenue;
+  const totalInspections = stats?.totalInspections ?? mockDashboardStats.totalInspections;
+  const activeTechnicians = stats?.activeTechnicians ?? mockDashboardStats.activeTechnicians;
+  const completionRate = stats?.completionRate ?? mockDashboardStats.completionRate;
+
+  // Recent payments (still mock — payments need a dedicated endpoint)
   const recentPayments = mockPayments.slice(0, 5);
 
   return (

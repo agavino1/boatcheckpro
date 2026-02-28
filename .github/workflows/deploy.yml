@@ -1,37 +1,84 @@
-name: Deploy to Railway
+name: Deploy BoatCheckPro
 
 on:
   push:
-    branches: [ main ]
+    branches: [master, main]
+
+env:
+  GCP_REGION: europe-west1
+  SERVICE_NAME: boatcheckpro-api
+  IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/boatcheckpro-api
 
 jobs:
-  deploy:
+  # ─────────────────────────────────────────────
+  # Job 1: Deploy backend → Google Cloud Run
+  # ─────────────────────────────────────────────
+  deploy-backend:
+    name: Deploy Backend to Cloud Run
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.x'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Run linter
-      run: npm run lint --if-present || true
-    
-    - name: Build
-      run: npm run build
-    
-    - name: Deploy to Railway
-      uses: railway-app/railway-action@v1
-      with:
-        token: ${{ secrets.RAILWAY_TOKEN }}
-        service: boatcheckpro
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Success notification
-      if: success()
-      run: echo "✅ Frontend deployment successful!"
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --tag $IMAGE:$GITHUB_SHA \
+            --tag $IMAGE:latest \
+            .
+
+      - name: Push Docker image to GCR
+        run: |
+          docker push $IMAGE:$GITHUB_SHA
+          docker push $IMAGE:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image $IMAGE:$GITHUB_SHA \
+            --region $GCP_REGION \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 8080 \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 10 \
+            --set-env-vars "\
+              NODE_ENV=production,\
+              PORT=8080,\
+              DATABASE_URL=${{ secrets.DATABASE_URL }},\
+              JWT_SECRET=${{ secrets.JWT_SECRET }},\
+              STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }},\
+              STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }},\
+              EMAIL_HOST=${{ secrets.EMAIL_HOST }},\
+              EMAIL_PORT=${{ secrets.EMAIL_PORT }},\
+              EMAIL_USER=${{ secrets.EMAIL_USER }},\
+              EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }},\
+              FRONTEND_URL=${{ secrets.FRONTEND_URL }},\
+              API_URL=${{ secrets.API_URL }}"
+
+      - name: Show deployed URL
+        run: |
+          echo "✅ Backend deployed!"
+          gcloud run services describe $SERVICE_NAME \
+            --region $GCP_REGION \
+            --format 'value(status.url)'
+
+  # ─────────────────────────────────────────────
+  # Job 2: Frontend → Vercel (gestiona Vercel automáticamente)
+  # Solo necesitas conectar el repo en vercel.com
+  # y configurar Root Directory = "frontend"
+  # ─────────────────────────────────────────────
