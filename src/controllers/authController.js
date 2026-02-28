@@ -187,3 +187,52 @@ export const resendVerificationEmail = async (req, res, next) => {
     next(err);
   }
 };
+
+export const oauthLogin = async (req, res, next) => {
+  try {
+    const { provider, email, name, providerId } = req.body;
+    if (!provider || !email) {
+      return res.status(400).json({ error: 'provider and email are required' });
+    }
+
+    let user = await User.findOne({ where: { email } });
+    if (!user) {
+      const parts = (name || email.split('@')[0]).split(' ');
+      const firstName = parts[0] || 'User';
+      const lastName = parts.slice(1).join(' ') || '';
+      const crypto = await import('crypto');
+      user = await User.create({
+        firstName,
+        lastName,
+        email,
+        password: crypto.randomBytes(32).toString('hex'),
+        role: 'cliente',
+        emailVerified: true,
+      });
+    } else if (!user.emailVerified) {
+      await user.update({ emailVerified: true });
+    }
+
+    await user.update({ lastLoginAt: new Date() });
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRATION || '7d' }
+    );
+
+    res.json({
+      message: 'OAuth login successful',
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
+      token,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

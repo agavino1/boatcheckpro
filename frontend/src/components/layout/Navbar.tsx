@@ -1,33 +1,56 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X, Anchor, LogOut, LayoutDashboard } from 'lucide-react'
+import { Menu, X, Anchor, LogOut, LayoutDashboard, ChevronDown, Palette } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
+import { useLanguage } from '@/context/LanguageContext'
+import { useTheme, Theme } from '@/context/ThemeContext'
+import { Language, languageNames } from '@/i18n'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [langOpen, setLangOpen] = useState(false)
+  const [themeOpen, setThemeOpen] = useState(false)
   const { user, isAuthenticated, logout } = useAuth()
+  const { lang, setLang, t } = useLanguage()
+  const { theme, setTheme, themes } = useTheme()
+  const langRef = useRef<HTMLDivElement>(null)
+  const themeRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false)
+      if (themeRef.current && !themeRef.current.contains(e.target as Node)) setThemeOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const navItems = [
-    { label: 'How It Works', href: '#how-it-works' },
-    { label: 'Gallery', href: '#gallery' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'FAQ', href: '#faq' },
+    { label: t.nav.howItWorks, href: '#how-it-works' },
+    { label: t.nav.gallery, href: '#gallery' },
+    { label: t.nav.pricing, href: '#pricing' },
+    { label: t.nav.faq, href: '#faq' },
   ]
 
   const initials = user
     ? `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase()
     : ''
 
+  const themeLabels: Record<Theme, string> = {
+    light: '☀️', dark: '🌙', cupcake: '🧁', business: '💼', cyberpunk: '⚡', forest: '🌲',
+  }
+
   return (
-    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-200">
+    <nav className="fixed top-0 w-full bg-base-100/80 backdrop-blur-md z-50 border-b border-base-300">
       <div className="container-custom">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-bold text-2xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-lg flex items-center justify-center">
-              <Anchor className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+              <Anchor className="w-6 h-6 text-primary-content" />
             </div>
             <span className="gradient-text">BoatCheckPro</span>
           </Link>
@@ -38,48 +61,100 @@ export default function Navbar() {
               <a
                 key={item.href}
                 href={item.href}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
+                className="text-base-content/70 hover:text-primary transition-colors font-medium"
               >
                 {item.label}
               </a>
             ))}
           </div>
 
-          {/* CTA Buttons */}
-          <div className="hidden md:flex gap-4 items-center">
+          {/* Right side controls */}
+          <div className="hidden md:flex gap-3 items-center">
+            {/* Language selector */}
+            <div className="relative" ref={langRef}>
+              <button
+                onClick={() => { setLangOpen(!langOpen); setThemeOpen(false) }}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-base-content/70 hover:text-primary hover:bg-base-200 transition-colors"
+              >
+                {languageNames[lang]}
+                <ChevronDown className={`w-3 h-3 transition-transform ${langOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {langOpen && (
+                <div className="absolute right-0 mt-2 w-28 bg-base-100 border border-base-300 rounded-xl shadow-xl z-50 overflow-hidden">
+                  {(Object.keys(languageNames) as Language[]).map((l) => (
+                    <button
+                      key={l}
+                      onClick={() => { setLang(l); setLangOpen(false) }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-base-200 transition-colors ${lang === l ? 'text-primary font-bold' : 'text-base-content'}`}
+                    >
+                      {languageNames[l]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Theme selector */}
+            <div className="relative" ref={themeRef}>
+              <button
+                onClick={() => { setThemeOpen(!themeOpen); setLangOpen(false) }}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-base-content/70 hover:text-primary hover:bg-base-200 transition-colors"
+                title={t.theme.label}
+              >
+                <Palette className="w-4 h-4" />
+                <span className="text-xs">{themeLabels[theme]}</span>
+                <ChevronDown className={`w-3 h-3 transition-transform ${themeOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {themeOpen && (
+                <div className="absolute right-0 mt-2 w-36 bg-base-100 border border-base-300 rounded-xl shadow-xl z-50 overflow-hidden">
+                  {themes.map((th) => (
+                    <button
+                      key={th}
+                      onClick={() => { setTheme(th); setThemeOpen(false) }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-base-200 transition-colors flex items-center gap-2 ${theme === th ? 'text-primary font-bold' : 'text-base-content'}`}
+                    >
+                      <span>{themeLabels[th]}</span>
+                      {t.theme.themes[th]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Auth buttons */}
             {isAuthenticated && user ? (
               <>
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-2 text-gray-700 hover:text-primary-600 transition-colors font-medium"
+                  className="flex items-center gap-2 text-base-content/70 hover:text-primary transition-colors font-medium"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
+                  {t.nav.dashboard}
                 </Link>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                  <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-primary-content font-bold text-xs">
                     {initials}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{user.firstName}</span>
+                  <span className="text-sm font-medium text-base-content">{user.firstName}</span>
                 </div>
                 <button
                   onClick={logout}
-                  className="flex items-center gap-1 text-sm text-red-500 hover:text-red-700 transition-colors"
+                  className="flex items-center gap-1 text-sm text-error hover:text-error/80 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
-                  Sign Out
+                  {t.nav.signOut}
                 </button>
               </>
             ) : (
               <>
                 <Link
                   href="/login"
-                  className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
+                  className="text-base-content/70 hover:text-primary transition-colors font-medium"
                 >
-                  Sign In
+                  {t.nav.signIn}
                 </Link>
-                <Link href="/register" className="btn-primary text-sm">
-                  Get Started
+                <Link href="/register" className="btn btn-primary btn-sm">
+                  {t.nav.getStarted}
                 </Link>
               </>
             )}
@@ -93,43 +168,67 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden pb-4 border-t border-gray-200">
+          <div className="md:hidden pb-4 border-t border-base-300">
             {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                className="block py-2 text-base-content/70 hover:text-primary transition-colors"
               >
                 {item.label}
               </a>
             ))}
+            {/* Mobile language */}
+            <div className="flex gap-2 mt-3 flex-wrap">
+              {(Object.keys(languageNames) as Language[]).map((l) => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  className={`px-2 py-1 text-xs rounded-lg border ${lang === l ? 'border-primary text-primary font-bold' : 'border-base-300 text-base-content/60'}`}
+                >
+                  {languageNames[l]}
+                </button>
+              ))}
+            </div>
+            {/* Mobile theme */}
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {themes.map((th) => (
+                <button
+                  key={th}
+                  onClick={() => setTheme(th)}
+                  className={`px-2 py-1 text-xs rounded-lg border ${theme === th ? 'border-primary text-primary font-bold' : 'border-base-300 text-base-content/60'}`}
+                >
+                  {themeLabels[th]} {t.theme.themes[th]}
+                </button>
+              ))}
+            </div>
             <div className="flex gap-2 mt-4">
               {isAuthenticated ? (
                 <>
                   <Link
                     href="/dashboard"
-                    className="flex-1 text-center py-2 border border-primary-600 text-primary-600 rounded-lg font-medium"
+                    className="flex-1 text-center py-2 border border-primary text-primary rounded-lg font-medium"
                   >
-                    Dashboard
+                    {t.nav.dashboard}
                   </Link>
                   <button
                     onClick={logout}
-                    className="flex-1 text-center py-2 border border-red-400 text-red-500 rounded-lg font-medium"
+                    className="flex-1 text-center py-2 border border-error text-error rounded-lg font-medium"
                   >
-                    Sign Out
+                    {t.nav.signOut}
                   </button>
                 </>
               ) : (
                 <>
                   <Link
                     href="/login"
-                    className="flex-1 text-center py-2 border border-primary-600 text-primary-600 rounded-lg font-medium"
+                    className="flex-1 text-center py-2 border border-primary text-primary rounded-lg font-medium"
                   >
-                    Sign In
+                    {t.nav.signIn}
                   </Link>
-                  <Link href="/register" className="flex-1 btn-primary text-center">
-                    Get Started
+                  <Link href="/register" className="flex-1 btn btn-primary text-center">
+                    {t.nav.getStarted}
                   </Link>
                 </>
               )}
