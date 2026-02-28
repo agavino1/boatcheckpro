@@ -23,8 +23,19 @@ const PORT = Number(normalizeEnv(process.env.PORT)) || 3000;
 
 // Middleware
 app.use(helmet());
+const allowedOrigins = [
+  normalizeEnv(process.env.FRONTEND_URL),
+  'http://localhost:3001',
+  'https://checkthatboat.com',
+  'https://www.checkthatboat.com',
+  'https://boatcheckpro.vercel.app',
+].filter(Boolean);
+
 app.use(cors({
-  origin: normalizeEnv(process.env.FRONTEND_URL) || 'http://localhost:3001',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
 app.use(express.json());
