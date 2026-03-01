@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, Anchor, Check } from 'lucide-react'
+import { Eye, EyeOff, Check } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
+import BrandIcon from '@/components/BrandIcon'
 
 function GoogleIcon() {
   return (
@@ -99,7 +100,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg mb-4">
-            <Anchor className="w-6 h-6 text-primary-content" />
+            <BrandIcon className="w-6 h-6 text-primary-content" />
           </div>
           <h1 className="text-3xl font-bold text-base-content">{t.auth.register.title}</h1>
           <p className="text-base-content/60 mt-2">{t.auth.register.subtitle}</p>
@@ -116,14 +117,9 @@ export default function RegisterPage() {
             {/* OAuth buttons */}
             <div className="space-y-2 mb-4">
               <p className="text-center text-sm text-base-content/50">{t.auth.register.orWith}</p>
-              <div className="flex flex-col gap-2">
-                <button type="button" onClick={() => window.location.href = '/api/auth/signin/google'} className="btn btn-outline gap-2 w-full text-sm">
-                  <GoogleIcon />Google
-                </button>
-                <button type="button" onClick={() => window.location.href = '/api/auth/signin/facebook'} className="btn btn-outline gap-2 w-full text-sm">
-                  <FacebookIcon />Facebook
-                </button>
-              </div>
+              <button type="button" onClick={() => window.location.href = '/api/auth/signin/google'} className="btn btn-outline gap-2 w-full text-sm">
+                <GoogleIcon />Google
+              </button>
             </div>
 
             <div className="divider text-xs text-base-content/40">Email</div>
