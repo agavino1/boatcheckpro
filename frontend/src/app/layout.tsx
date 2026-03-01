@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import NextAuthProvider from '@/components/NextAuthProvider'
 import { AuthProvider } from '@/context/AuthContext'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { ThemeProvider } from '@/context/ThemeContext'
@@ -23,15 +24,17 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>
-        <ThemeProvider>
-          <LanguageProvider>
-            <AuthProvider>
-              <Navbar />
-              {children}
-              <Footer />
-            </AuthProvider>
-          </LanguageProvider>
-        </ThemeProvider>
+        <NextAuthProvider>
+          <ThemeProvider>
+            <LanguageProvider>
+              <AuthProvider>
+                <Navbar />
+                {children}
+                <Footer />
+              </AuthProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </NextAuthProvider>
       </body>
     </html>
   )

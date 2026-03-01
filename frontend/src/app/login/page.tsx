@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
+import { signIn } from 'next-auth/react'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import BrandIcon from '@/components/BrandIcon'
@@ -100,7 +101,7 @@ export default function LoginPage() {
             {/* OAuth buttons */}
             <div className="space-y-3 mb-6">
               <p className="text-center text-sm text-base-content/50">{t.auth.login.orWith}</p>
-              <button type="button" onClick={() => window.location.href = '/api/auth/signin/google'} className="btn btn-outline gap-2 w-full text-sm">
+              <button type="button" onClick={() => signIn('google', { callbackUrl: '/auth/oauth-success' })} className="btn btn-outline gap-2 w-full text-sm">
                 <GoogleIcon />Google
               </button>
             </div>
