@@ -127,14 +127,9 @@ export default function RegisterPage() {
                   <MicrosoftIcon />Microsoft
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => window.location.href = '/api/auth/signin/github'} className="btn btn-outline gap-2 text-sm">
-                  <GithubIcon />GitHub
-                </button>
-                <button type="button" onClick={() => window.location.href = '/api/auth/signin/apple'} className="btn btn-outline gap-2 text-sm">
-                  <AppleIcon />Apple
-                </button>
-              </div>
+              <button type="button" onClick={() => window.location.href = '/api/auth/signin/apple'} className="btn btn-outline gap-2 w-full text-sm">
+                <AppleIcon />Apple
+              </button>
             </div>
 
             <div className="divider text-xs text-base-content/40">Email</div>
