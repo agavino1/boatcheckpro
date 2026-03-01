@@ -163,6 +163,7 @@ export const es = {
     title: 'Solicitar una inspección',
     subtitle: 'Cuéntanos sobre el barco y nos ponemos en marcha',
     step1Label: 'El barco', step2Label: 'La inspección', step3Label: 'Confirmación',
+    orManual: 'o rellena manualmente',
     back: 'Atrás', next: 'Siguiente',
     submit: 'Enviar solicitud', submitting: 'Enviando…',
     successTitle: '¡Solicitud recibida!',

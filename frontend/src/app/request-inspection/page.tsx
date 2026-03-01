@@ -136,7 +136,7 @@ export default function RequestInspectionPage() {
                     </label>
                   </div>
 
-                  <div className="divider text-xs text-base-content/40">o rellena manualmente</div>
+                  <div className="divider text-xs text-base-content/40">{t.request.orManual}</div>
 
                   <div className="form-control">
                     <label className="label"><span className="label-text">{t.request.boatName}</span></label>

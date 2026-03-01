@@ -10,9 +10,9 @@ export type Translations = typeof es
 export const translations: Record<Language, Translations> = { es, en, fr, it, pt }
 
 export const languageNames: Record<Language, string> = {
-  es: '🇪🇸 ES',
-  en: '🇬🇧 EN',
-  fr: '🇫🇷 FR',
-  it: '🇮🇹 IT',
-  pt: '🇵🇹 PT',
+  es: 'ES',
+  en: 'EN',
+  fr: 'FR',
+  it: 'IT',
+  pt: 'PT',
 }

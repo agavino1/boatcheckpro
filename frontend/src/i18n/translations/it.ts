@@ -165,6 +165,7 @@ export const it: Translations = {
     title: 'Richiedi un\'ispezione',
     subtitle: 'Raccontaci della barca e ci pensiamo noi',
     step1Label: 'La barca', step2Label: 'L\'ispezione', step3Label: 'Conferma',
+    orManual: 'o compila manualmente',
     back: 'Indietro', next: 'Avanti',
     submit: 'Invia richiesta', submitting: 'Invio in corso…',
     successTitle: 'Richiesta ricevuta!',

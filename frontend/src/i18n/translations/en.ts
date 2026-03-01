@@ -165,6 +165,7 @@ export const en: Translations = {
     title: 'Request an Inspection',
     subtitle: 'Tell us about the boat and we\'ll get started',
     step1Label: 'The Boat', step2Label: 'The Inspection', step3Label: 'Confirm',
+    orManual: 'or fill in manually',
     back: 'Back', next: 'Next',
     submit: 'Submit Request', submitting: 'Submitting…',
     successTitle: 'Request Received!',
