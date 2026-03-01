@@ -148,6 +148,7 @@ export interface CreateInspectionPayload {
   location: string
   preferredDate: string
   notes?: string
+  listingUrl?: string
 }
 
 export const inspections = {

@@ -1,5 +1,5 @@
 import { Technician, User, Inspection } from '../models/index.js';
-import { Op } from 'sequelize';
+import { Op, fn, col } from 'sequelize';
 
 export const createTechnicianProfile = async (req, res, next) => {
   try {
@@ -189,7 +189,7 @@ export const getTechnicianStats = async (req, res, next) => {
       where: { technicianId: req.user.id },
       attributes: [
         'inspectionType',
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count'],
+        [fn('COUNT', col('id')), 'count'],
       ],
       group: ['inspectionType'],
       raw: true,

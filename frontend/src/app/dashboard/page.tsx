@@ -2,37 +2,25 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import {
-  Home,
-  LogOut,
-  Menu,
-  X,
-  Plus,
-  MoreVertical,
-  Download,
-  Calendar,
-  DollarSign,
-  Clock,
-  CheckCircle,
-  Loader2,
-} from 'lucide-react'
+import { Plus, Download, Calendar, DollarSign, Clock, CheckCircle, Loader2, MoreVertical } from 'lucide-react'
 import { useRequireAuth } from '@/context/AuthContext'
+import { useLanguage } from '@/context/LanguageContext'
 import { users, type Inspection, type UserStats } from '@/lib/api'
 
-function statusStyle(status: string) {
+function statusBadge(status: string) {
   const map: Record<string, string> = {
-    completada: 'bg-green-100 text-green-700',
-    confirmada: 'bg-blue-100 text-blue-700',
-    'en-progreso': 'bg-yellow-100 text-yellow-700',
-    pendiente: 'bg-gray-100 text-gray-700',
-    cancelada: 'bg-red-100 text-red-700',
+    completada: 'badge-success',
+    confirmada: 'badge-info',
+    'en-progreso': 'badge-warning',
+    pendiente: 'badge-ghost',
+    cancelada: 'badge-error',
   }
-  return map[status] ?? 'bg-gray-100 text-gray-600'
+  return `badge badge-sm ${map[status] ?? 'badge-ghost'}`
 }
 
 export default function DashboardPage() {
   const { user, logout } = useRequireAuth()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { t } = useLanguage()
   const [inspections, setInspections] = useState<Inspection[]>([])
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -41,260 +29,175 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return
     Promise.all([users.myInspections(), users.myStats()])
-      .then(([ins, st]) => {
-        setInspections(ins)
-        setStats(st)
-      })
+      .then(([ins, st]) => { setInspections(ins); setStats(st) })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
   }, [user])
 
-  const displayName = user ? `${user.firstName} ${user.lastName}` : ''
   const initials = user
-    ? `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase()
+    ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() || '?'
     : '?'
 
   const kpis = [
-    {
-      label: 'Total Inspections',
-      value: stats?.totalInspections ?? inspections.length,
-      icon: Calendar,
-    },
-    {
-      label: 'Completed',
-      value: stats?.completedInspections ?? inspections.filter((i) => i.status === 'completada').length,
-      icon: CheckCircle,
-    },
-    {
-      label: 'Total Spent',
-      value: stats ? `$${stats.totalSpent.toLocaleString()}` : '—',
-      icon: DollarSign,
-    },
-    {
-      label: 'Avg. Duration',
-      value: stats ? `${stats.averageDuration}h` : '—',
-      icon: Clock,
-    },
+    { label: t.dashboard.kpi1, value: stats?.totalInspections ?? inspections.length, icon: Calendar },
+    { label: t.dashboard.kpi2, value: stats?.completedInspections ?? inspections.filter((i) => i.status === 'completada').length, icon: CheckCircle },
+    { label: t.dashboard.kpi3, value: stats ? `€${stats.totalSpent.toLocaleString()}` : '—', icon: DollarSign },
+    { label: t.dashboard.kpi4, value: stats ? `${stats.averageDuration}h` : '—', icon: Clock },
   ]
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-20">
-      <div className="flex h-full">
-        {/* Sidebar */}
-        <aside
-          className={`fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white transition-transform md:relative md:translate-x-0 ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } mt-20`}
-        >
-          <div className="p-6 space-y-6">
-            {user && (
-              <div className="flex items-center gap-3 pb-4 border-b border-gray-700">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  {initials}
-                </div>
-                <div>
-                  <p className="font-semibold text-white text-sm">{displayName}</p>
-                  <p className="text-xs text-gray-400 capitalize">{user.role}</p>
-                </div>
-              </div>
-            )}
+    <div className="min-h-screen bg-base-200 pt-20">
+      <div className="container-custom py-8">
 
-            <nav className="space-y-2">
-              <a
-                href="#"
-                className="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary-600 text-white font-medium"
-              >
-                <Home className="w-5 h-5" />
-                Dashboard
-              </a>
-              <Link
-                href="/request-inspection"
-                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-                New Inspection
-              </Link>
-              <Link
-                href="/calendar"
-                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                <Calendar className="w-5 h-5" />
-                Schedule
-              </Link>
-            </nav>
-
-            <div className="border-t border-gray-800 pt-6">
-              <button
-                onClick={logout}
-                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-red-400 w-full"
-              >
-                <LogOut className="w-5 h-5" />
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1">
-          {/* Top bar */}
-          <div className="fixed top-20 right-0 left-0 md:left-64 bg-white border-b border-gray-200 z-30">
-            <div className="flex items-center justify-between px-6 py-4">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                </button>
-                <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-              </div>
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                {initials}
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className="avatar placeholder">
+              <div className="w-12 rounded-full bg-gradient-to-br from-primary to-secondary text-primary-content">
+                <span className="text-lg font-bold">{initials}</span>
               </div>
             </div>
+            <div>
+              <h1 className="text-2xl font-bold text-base-content">{t.dashboard.title}</h1>
+              {user && <p className="text-base-content/60 text-sm">{user.email}</p>}
+            </div>
           </div>
+          <Link href="/request-inspection" className="btn btn-primary btn-sm gap-2">
+            <Plus className="w-4 h-4" />
+            {t.dashboard.newInspection}
+          </Link>
+        </div>
 
-          {/* Content */}
-          <div className="p-6 mt-20">
-            {loading && (
-              <div className="flex items-center justify-center py-20 text-gray-500">
-                <Loader2 className="w-6 h-6 animate-spin mr-2" />
-                Loading your data…
-              </div>
-            )}
+        {loading && (
+          <div className="flex items-center justify-center py-20 text-base-content/50">
+            <Loader2 className="w-6 h-6 animate-spin mr-2" />
+            {t.dashboard.loading}
+          </div>
+        )}
 
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
-                {error}
-              </div>
-            )}
+        {error && (
+          <div className="alert alert-error mb-6">
+            <span>{error}</span>
+          </div>
+        )}
 
-            {!loading && (
-              <>
-                {/* KPI cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                  {kpis.map((kpi) => {
-                    const Icon = kpi.icon
-                    return (
-                      <div key={kpi.label} className="card p-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <p className="text-gray-600 text-sm font-medium">{kpi.label}</p>
-                          <Icon className="w-5 h-5 text-primary-600" />
-                        </div>
-                        <p className="text-3xl font-bold text-gray-900">{kpi.value}</p>
+        {!loading && (
+          <>
+            {/* KPI cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {kpis.map((kpi) => {
+                const Icon = kpi.icon
+                return (
+                  <div key={kpi.label} className="card bg-base-100 shadow-sm border border-base-300">
+                    <div className="card-body p-5">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-base-content/60 text-xs font-medium uppercase tracking-wide">{kpi.label}</p>
+                        <Icon className="w-4 h-4 text-primary" />
                       </div>
-                    )
-                  })}
+                      <p className="text-3xl font-bold text-base-content">{kpi.value}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Inspections table */}
+            <div className="card bg-base-100 shadow-sm border border-base-300 mb-6">
+              <div className="card-body">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="card-title text-lg">{t.dashboard.myInspections}</h2>
+                  <Link href="/request-inspection" className="btn btn-primary btn-xs gap-1">
+                    <Plus className="w-3 h-3" />
+                    {t.dashboard.newInspection}
+                  </Link>
                 </div>
 
-                {/* Inspections table */}
-                <div className="card p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-gray-900">My Inspections</h2>
-                    <Link href="/request-inspection" className="btn-primary text-sm">
-                      + New Inspection
+                {inspections.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Calendar className="w-12 h-12 mx-auto mb-4 text-base-content/20" />
+                    <p className="font-medium text-base-content/60">{t.dashboard.noInspections}</p>
+                    <p className="text-sm mt-1 text-base-content/40">{t.dashboard.noInspectionsDesc}</p>
+                    <Link href="/request-inspection" className="btn btn-primary btn-sm mt-4">
+                      {t.dashboard.requestInspection}
                     </Link>
                   </div>
-
-                  {inspections.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                      <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                      <p className="font-medium">No inspections yet</p>
-                      <p className="text-sm mt-1">Request your first inspection to get started.</p>
-                      <Link href="/request-inspection" className="btn-primary mt-4 inline-block text-sm">
-                        Request Inspection
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b border-gray-200">
-                            <th className="text-left py-4 px-4 font-semibold text-gray-700">Boat</th>
-                            <th className="text-left py-4 px-4 font-semibold text-gray-700">Type</th>
-                            <th className="text-left py-4 px-4 font-semibold text-gray-700">Status</th>
-                            <th className="text-left py-4 px-4 font-semibold text-gray-700">Date</th>
-                            <th className="text-left py-4 px-4 font-semibold text-gray-700">Technician</th>
-                            <th className="text-right py-4 px-4 font-semibold text-gray-700">Price</th>
-                            <th className="text-right py-4 px-4 font-semibold text-gray-700" />
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>{t.dashboard.colBoat}</th>
+                          <th>{t.dashboard.colType}</th>
+                          <th>{t.dashboard.colStatus}</th>
+                          <th>{t.dashboard.colDate}</th>
+                          <th>{t.dashboard.colTechnician}</th>
+                          <th className="text-right">{t.dashboard.colPrice}</th>
+                          <th />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {inspections.map((inspection) => (
+                          <tr key={inspection.id} className="hover">
+                            <td>
+                              <p className="font-semibold">{inspection.boatName}</p>
+                              {inspection.boatYear && <p className="text-xs text-base-content/50">{inspection.boatYear}</p>}
+                            </td>
+                            <td className="capitalize text-sm">{inspection.inspectionType}</td>
+                            <td>
+                              <span className={statusBadge(inspection.status)}>{inspection.status}</span>
+                            </td>
+                            <td className="text-sm">{inspection.date ?? '—'}</td>
+                            <td className="text-sm">
+                              {inspection.technician
+                                ? `${inspection.technician.firstName} ${inspection.technician.lastName}`
+                                : t.dashboard.pendingAssignment}
+                            </td>
+                            <td className="text-right font-semibold text-sm">
+                              {inspection.price ? `€${inspection.price}` : '—'}
+                            </td>
+                            <td>
+                              <button className="btn btn-ghost btn-xs">
+                                <MoreVertical className="w-4 h-4" />
+                              </button>
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {inspections.map((inspection) => (
-                            <tr
-                              key={inspection.id}
-                              className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                            >
-                              <td className="py-4 px-4">
-                                <p className="font-semibold text-gray-900">{inspection.boatName}</p>
-                                {inspection.boatYear && (
-                                  <p className="text-sm text-gray-500">{inspection.boatYear}</p>
-                                )}
-                              </td>
-                              <td className="py-4 px-4 text-gray-700 capitalize">
-                                {inspection.inspectionType}
-                              </td>
-                              <td className="py-4 px-4">
-                                <span
-                                  className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${statusStyle(
-                                    inspection.status
-                                  )}`}
-                                >
-                                  {inspection.status}
-                                </span>
-                              </td>
-                              <td className="py-4 px-4 text-gray-700">
-                                {inspection.date ?? '—'}
-                              </td>
-                              <td className="py-4 px-4 text-gray-700">
-                                {inspection.technician
-                                  ? `${inspection.technician.firstName} ${inspection.technician.lastName}`
-                                  : 'Pending assignment'}
-                              </td>
-                              <td className="py-4 px-4 text-right font-semibold text-gray-900">
-                                {inspection.price ? `$${inspection.price}` : '—'}
-                              </td>
-                              <td className="py-4 px-4 text-right">
-                                <button className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                                  <MoreVertical className="w-5 h-5 text-gray-600" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
 
-                {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                  <div className="card p-6 bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200">
-                    <h3 className="font-bold text-gray-900 mb-4">Need a Quick Inspection?</h3>
-                    <p className="text-gray-700 text-sm mb-4">
-                      Book an express inspection and get your report in 24 hours.
-                    </p>
-                    <Link href="/request-inspection" className="btn-primary text-sm">
-                      Book Inspection
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="card bg-primary text-primary-content shadow-sm">
+                <div className="card-body">
+                  <h3 className="card-title text-base">{t.dashboard.quickTitle}</h3>
+                  <p className="text-primary-content/80 text-sm">{t.dashboard.quickDesc}</p>
+                  <div className="card-actions mt-2">
+                    <Link href="/request-inspection" className="btn btn-sm bg-white/20 hover:bg-white/30 border-0 text-white">
+                      {t.dashboard.book}
                     </Link>
                   </div>
+                </div>
+              </div>
 
-                  <div className="card p-6 bg-gradient-to-br from-secondary-50 to-secondary-100 border-secondary-200">
-                    <h3 className="font-bold text-gray-900 mb-4">Download Your Reports</h3>
-                    <p className="text-gray-700 text-sm mb-4">
-                      Access all your inspection reports in PDF format.
-                    </p>
-                    <button className="btn-secondary text-sm flex items-center gap-2">
+              <div className="card bg-base-100 shadow-sm border border-base-300">
+                <div className="card-body">
+                  <h3 className="card-title text-base">{t.dashboard.downloadTitle}</h3>
+                  <p className="text-base-content/60 text-sm">{t.dashboard.downloadDesc}</p>
+                  <div className="card-actions mt-2">
+                    <button className="btn btn-outline btn-sm gap-2">
                       <Download className="w-4 h-4" />
-                      Download All
+                      {t.dashboard.downloadAll}
                     </button>
                   </div>
                 </div>
-              </>
-            )}
-          </div>
-        </main>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

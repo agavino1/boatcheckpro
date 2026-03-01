@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
 import { User } from '../models/index.js';
 import { generateEmailVerificationToken, sendVerificationEmail } from '../utils/email.js';
 import crypto from 'crypto';
@@ -114,7 +115,7 @@ export const verifyEmail = async (req, res, next) => {
     const user = await User.findOne({
       where: {
         emailVerificationToken: token,
-        emailVerificationExpiry: { [require('sequelize').Op.gt]: new Date() },
+        emailVerificationExpiry: { [Op.gt]: new Date() },
       },
     });
 

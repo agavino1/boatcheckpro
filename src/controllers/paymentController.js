@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { Payment, Inspection, User } from '../models/index.js';
 import { generateInvoice } from '../utils/invoice.js';
-import { Op } from 'sequelize';
+import { Op, fn, col } from 'sequelize';
 
 let stripe = null;
 try {
@@ -285,8 +285,8 @@ export const getRevenueStats = async (req, res, next) => {
     const paymentsByType = await Payment.findAll({
       where,
       attributes: [
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count'],
-        [require('sequelize').fn('SUM', require('sequelize').col('amount')), 'total'],
+        [fn('COUNT', col('id')), 'count'],
+        [fn('SUM', col('amount')), 'total'],
       ],
       group: ['status'],
       raw: true,

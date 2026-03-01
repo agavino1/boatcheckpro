@@ -22,6 +22,9 @@ const Inspection = sequelize.define('Inspection', {
       key: 'id',
     },
   },
+  listingUrl: {
+    type: DataTypes.STRING,
+  },
   boatName: {
     type: DataTypes.STRING,
     allowNull: false,

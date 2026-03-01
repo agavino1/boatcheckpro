@@ -1,5 +1,5 @@
 import { User, Inspection, Payment, Technician } from '../models/index.js';
-import { Op } from 'sequelize';
+import { Op, fn, col } from 'sequelize';
 
 export const getDashboard = async (req, res, next) => {
   try {
@@ -134,7 +134,7 @@ export const getInspectionReports = async (req, res, next) => {
     const inspectionsByType = await Inspection.findAll({
       attributes: [
         'inspectionType',
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count'],
+        [fn('COUNT', col('id')), 'count'],
       ],
       group: ['inspectionType'],
       raw: true,
@@ -179,8 +179,8 @@ export const getRevenueAnalytics = async (req, res, next) => {
       ],
       attributes: [
         'inspectionType',
-        [require('sequelize').fn('COUNT', require('sequelize').col('Inspections.id')), 'count'],
-        [require('sequelize').fn('SUM', require('sequelize').col('Payment.amount')), 'total'],
+        [fn('COUNT', col('Inspections.id')), 'count'],
+        [fn('SUM', col('Payment.amount')), 'total'],
       ],
       group: ['inspectionType'],
       raw: true,
@@ -189,12 +189,12 @@ export const getRevenueAnalytics = async (req, res, next) => {
     const monthlyRevenue = await Payment.findAll({
       where,
       attributes: [
-        [require('sequelize').fn('DATE_TRUNC', 'month', require('sequelize').col('paidAt')), 'month'],
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count'],
-        [require('sequelize').fn('SUM', require('sequelize').col('amount')), 'total'],
+        [fn('DATE_TRUNC', 'month', col('paidAt')), 'month'],
+        [fn('COUNT', col('id')), 'count'],
+        [fn('SUM', col('amount')), 'total'],
       ],
-      group: [require('sequelize').fn('DATE_TRUNC', 'month', require('sequelize').col('paidAt'))],
-      order: [[require('sequelize').fn('DATE_TRUNC', 'month', require('sequelize').col('paidAt')), 'ASC']],
+      group: [fn('DATE_TRUNC', 'month', col('paidAt'))],
+      order: [[fn('DATE_TRUNC', 'month', col('paidAt')), 'ASC']],
       raw: true,
     });
 

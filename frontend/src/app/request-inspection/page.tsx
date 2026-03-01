@@ -2,19 +2,22 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, CheckCircle, Loader2 } from 'lucide-react'
+import { ChevronRight, CheckCircle, Loader2, Link as LinkIcon } from 'lucide-react'
 import { useRequireAuth } from '@/context/AuthContext'
+import { useLanguage } from '@/context/LanguageContext'
 import { inspections } from '@/lib/api'
 
 export default function RequestInspectionPage() {
   useRequireAuth()
   const router = useRouter()
+  const { t } = useLanguage()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
   const [formData, setFormData] = useState({
+    listingUrl: '',
     boatName: '',
     boatType: 'sailboat',
     boatModel: '',
@@ -38,14 +41,17 @@ export default function RequestInspectionPage() {
     setLoading(true)
     try {
       await inspections.create({
-        boatName: formData.boatName,
+        boatName: formData.boatName || formData.listingUrl || '—',
         boatType: formData.boatType,
         boatModel: formData.boatModel,
         boatYear: formData.boatYear ? Number(formData.boatYear) : undefined,
         inspectionType: formData.inspectionType,
         location: formData.location,
         preferredDate: formData.preferredDate,
-        notes: formData.notes,
+        notes: [
+          formData.listingUrl ? `Anuncio: ${formData.listingUrl}` : '',
+          formData.notes,
+        ].filter(Boolean).join('\n'),
       })
       setSuccess(true)
     } catch (err) {
@@ -57,281 +63,246 @@ export default function RequestInspectionPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 pt-20 flex items-center justify-center">
-        <div className="card max-w-md w-full p-10 text-center shadow-lg">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Request Submitted!</h2>
-          <p className="text-gray-600 mb-6">
-            We&apos;ll confirm your inspection within 24 hours. You&apos;ll receive an email with
-            the details.
-          </p>
-          <button className="btn-primary w-full" onClick={() => router.push('/dashboard')}>
-            Go to Dashboard
-          </button>
+      <div className="min-h-screen bg-base-200 pt-20 flex items-center justify-center px-4">
+        <div className="card bg-base-100 shadow-lg max-w-md w-full">
+          <div className="card-body text-center">
+            <CheckCircle className="w-16 h-16 text-success mx-auto mb-4" />
+            <h2 className="card-title justify-center text-2xl">{t.request.successTitle}</h2>
+            <p className="text-base-content/60">{t.request.successDesc}</p>
+            <div className="card-actions justify-center mt-4">
+              <button className="btn btn-primary" onClick={() => router.push('/dashboard')}>
+                {t.request.goDashboard}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     )
   }
 
-  const boatTypes = [
-    { value: 'sailboat', label: 'Sailboat' },
-    { value: 'motor-yacht', label: 'Motor Yacht' },
-    { value: 'speedboat', label: 'Speedboat' },
-    { value: 'fishing-boat', label: 'Fishing Boat' },
-    { value: 'catamaran', label: 'Catamaran' },
-    { value: 'other', label: 'Other' },
-  ]
-
-  const inspectionTypes = [
-    { value: 'pre-compra', label: 'Pre-Purchase Inspection', desc: 'Before buying a boat' },
-    { value: 'mantenimiento', label: 'Maintenance Check', desc: 'Annual maintenance survey' },
-    { value: 'seguridad', label: 'Safety Inspection', desc: 'Safety systems review' },
-    { value: 'anual', label: 'Annual Survey', desc: 'Full annual inspection' },
-    { value: 'otro', label: 'Other', desc: 'Custom inspection request' },
-  ]
+  const boatTypeKeys = ['sailboat', 'motor-yacht', 'speedboat', 'fishing-boat', 'catamaran', 'other'] as const
+  const inspTypeKeys = ['pre-compra', 'mantenimiento', 'seguridad', 'anual', 'otro'] as const
+  const steps = [t.request.step1Label, t.request.step2Label, t.request.step3Label]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 pt-20">
+    <div className="min-h-screen bg-base-200 pt-20">
       <div className="container-custom py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="section-title">Request An Inspection</h1>
-          <p className="section-subtitle">
-            Tell us about your boat and we&apos;ll schedule a professional inspection
-          </p>
+
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold text-base-content">{t.request.title}</h1>
+          <p className="text-base-content/60 mt-2">{t.request.subtitle}</p>
         </div>
 
-        {/* Progress Indicator */}
+        {/* Progress steps */}
         <div className="max-w-2xl mx-auto mb-8">
-          <div className="flex items-center justify-between mb-4">
-            {[1, 2, 3].map((s) => (
-              <div key={s} className="flex items-center flex-1">
-                <button
-                  type="button"
-                  onClick={() => s < step && setStep(s)}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
-                    step >= s ? 'bg-primary-600 text-white' : 'bg-gray-300 text-gray-600'
-                  }`}
-                >
-                  {s}
-                </button>
-                {s < 3 && (
-                  <div
-                    className={`flex-1 h-1 mx-2 transition-all ${
-                      step > s ? 'bg-primary-600' : 'bg-gray-300'
-                    }`}
-                  />
-                )}
-              </div>
+          <ul className="steps w-full">
+            {steps.map((label, i) => (
+              <li key={label} className={`step ${step > i ? 'step-primary' : ''}`}>{label}</li>
             ))}
-          </div>
-          <div className="flex justify-between text-xs font-semibold text-gray-600">
-            <span>Boat Information</span>
-            <span>Inspection Details</span>
-            <span>Confirmation</span>
-          </div>
+          </ul>
         </div>
 
-        {/* Form Card */}
-        <div className="card max-w-2xl mx-auto p-8 shadow-lg">
-          {error && (
-            <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
+        <div className="card bg-base-100 shadow-sm border border-base-300 max-w-2xl mx-auto">
+          <div className="card-body">
+            {error && (
+              <div className="alert alert-error mb-4">
+                <span>{error}</span>
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit}>
-            {/* Step 1: Boat */}
-            {step === 1 && (
-              <div className="space-y-6 animate-fadeInUp">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Tell us about your boat</h2>
+            <form onSubmit={handleSubmit}>
+              {/* Step 1: Boat info */}
+              {step === 1 && (
+                <div className="space-y-5">
+                  <h2 className="text-xl font-bold">{t.request.step1Title}</h2>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Boat Name</label>
-                  <input
-                    type="text"
-                    name="boatName"
-                    value={formData.boatName}
-                    onChange={handleChange}
-                    placeholder="e.g., Sea Breeze"
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Boat Type</label>
-                    <select
-                      name="boatType"
-                      value={formData.boatType}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600 bg-white"
-                    >
-                      {boatTypes.map((t) => (
-                        <option key={t.value} value={t.value}>
-                          {t.label}
-                        </option>
-                      ))}
-                    </select>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text font-medium">{t.request.listingUrl}</span>
+                    </label>
+                    <div className="input input-bordered flex items-center gap-2">
+                      <LinkIcon className="w-4 h-4 text-base-content/40 shrink-0" />
+                      <input
+                        type="url"
+                        name="listingUrl"
+                        value={formData.listingUrl}
+                        onChange={handleChange}
+                        placeholder={t.request.listingUrlPlaceholder}
+                        className="grow bg-transparent outline-none text-sm"
+                      />
+                    </div>
+                    <label className="label">
+                      <span className="label-text-alt text-base-content/50">{t.request.listingUrlHint}</span>
+                    </label>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Year Built</label>
+
+                  <div className="divider text-xs text-base-content/40">o rellena manualmente</div>
+
+                  <div className="form-control">
+                    <label className="label"><span className="label-text">{t.request.boatName}</span></label>
                     <input
-                      type="number"
-                      name="boatYear"
-                      value={formData.boatYear}
+                      type="text"
+                      name="boatName"
+                      value={formData.boatName}
                       onChange={handleChange}
-                      placeholder="e.g., 2018"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                      placeholder={t.request.boatNamePlaceholder}
+                      className="input input-bordered w-full"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="form-control">
+                      <label className="label"><span className="label-text">{t.request.boatType}</span></label>
+                      <select name="boatType" value={formData.boatType} onChange={handleChange} className="select select-bordered w-full">
+                        {boatTypeKeys.map((k) => (
+                          <option key={k} value={k}>{t.request.boatTypes[k]}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-control">
+                      <label className="label"><span className="label-text">{t.request.boatYear}</span></label>
+                      <input
+                        type="number"
+                        name="boatYear"
+                        value={formData.boatYear}
+                        onChange={handleChange}
+                        placeholder={t.request.boatYearPlaceholder}
+                        className="input input-bordered w-full"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label"><span className="label-text">{t.request.boatModel}</span></label>
+                    <input
+                      type="text"
+                      name="boatModel"
+                      value={formData.boatModel}
+                      onChange={handleChange}
+                      placeholder={t.request.boatModelPlaceholder}
+                      className="input input-bordered w-full"
                     />
                   </div>
                 </div>
+              )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Model / Manufacturer
-                  </label>
-                  <input
-                    type="text"
-                    name="boatModel"
-                    value={formData.boatModel}
-                    onChange={handleChange}
-                    placeholder="e.g., Beneteau Oceanis 35"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                  />
+              {/* Step 2: Inspection details */}
+              {step === 2 && (
+                <div className="space-y-5">
+                  <h2 className="text-xl font-bold">{t.request.step2Title}</h2>
+
+                  <div className="space-y-2">
+                    {inspTypeKeys.map((k) => {
+                      const item = t.request.inspTypes[k]
+                      return (
+                        <label
+                          key={k}
+                          className={`flex items-start gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
+                            formData.inspectionType === k ? 'border-primary bg-primary/5' : 'border-base-300 hover:border-primary/50'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="inspectionType"
+                            value={k}
+                            checked={formData.inspectionType === k}
+                            onChange={handleChange}
+                            className="radio radio-primary mt-0.5"
+                          />
+                          <div>
+                            <p className="font-semibold text-base-content">{item.label}</p>
+                            <p className="text-sm text-base-content/60">{item.desc}</p>
+                          </div>
+                        </label>
+                      )
+                    })}
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label"><span className="label-text">{t.request.location}</span></label>
+                    <input
+                      type="text"
+                      name="location"
+                      value={formData.location}
+                      onChange={handleChange}
+                      placeholder={t.request.locationPlaceholder}
+                      required
+                      className="input input-bordered w-full"
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label"><span className="label-text">{t.request.preferredDate}</span></label>
+                    <input
+                      type="date"
+                      name="preferredDate"
+                      value={formData.preferredDate}
+                      onChange={handleChange}
+                      required
+                      className="input input-bordered w-full"
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label"><span className="label-text">{t.request.notes}</span></label>
+                    <textarea
+                      name="notes"
+                      value={formData.notes}
+                      onChange={handleChange}
+                      placeholder={t.request.notesPlaceholder}
+                      rows={3}
+                      className="textarea textarea-bordered w-full"
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Step 2: Inspection */}
-            {step === 2 && (
-              <div className="space-y-6 animate-fadeInUp">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">What inspection do you need?</h2>
+              {/* Step 3: Confirm */}
+              {step === 3 && (
+                <div className="space-y-5">
+                  <h2 className="text-xl font-bold">{t.request.step3Title}</h2>
 
-                <div className="space-y-3">
-                  {inspectionTypes.map((t) => (
-                    <label
-                      key={t.value}
-                      className="flex items-start gap-4 p-4 border-2 rounded-lg cursor-pointer hover:border-primary-600 transition-colors"
-                      style={{
-                        borderColor: formData.inspectionType === t.value ? '#0284c7' : '#e5e7eb',
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="inspectionType"
-                        value={t.value}
-                        checked={formData.inspectionType === t.value}
-                        onChange={handleChange}
-                        className="w-4 h-4 mt-1"
-                      />
-                      <div>
-                        <p className="font-semibold text-gray-900">{t.label}</p>
-                        <p className="text-sm text-gray-600">{t.desc}</p>
+                  <div className="bg-base-200 rounded-xl p-5 space-y-3">
+                    {([
+                      [t.request.labelBoat, formData.boatName || '—'],
+                      [t.request.labelType, t.request.boatTypes[formData.boatType as keyof typeof t.request.boatTypes] ?? formData.boatType],
+                      [t.request.labelYear, formData.boatYear || '—'],
+                      [t.request.labelInspection, t.request.inspTypes[formData.inspectionType as keyof typeof t.request.inspTypes]?.label ?? formData.inspectionType],
+                      [t.request.labelLocation, formData.location || '—'],
+                      [t.request.labelDate, formData.preferredDate || '—'],
+                      ...(formData.listingUrl ? [[t.request.labelListing, formData.listingUrl]] : []),
+                    ] as [string, string][]).map(([label, value]) => (
+                      <div key={label} className="flex justify-between gap-4 text-sm">
+                        <span className="text-base-content/60 font-medium shrink-0">{label}:</span>
+                        <span className="font-semibold text-base-content text-right break-all">{value}</span>
                       </div>
-                    </label>
-                  ))}
+                    ))}
+                  </div>
+
+                  <p className="text-xs text-base-content/50">{t.request.terms}</p>
+
+                  <button type="submit" disabled={loading} className="btn btn-primary w-full gap-2">
+                    {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {loading ? t.request.submitting : t.request.submit}
+                  </button>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Location / Marina</label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="e.g., Marina Bay, Harbor View"
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Date</label>
-                  <input
-                    type="date"
-                    name="preferredDate"
-                    value={formData.preferredDate}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Additional Notes</label>
-                  <textarea
-                    name="notes"
-                    value={formData.notes}
-                    onChange={handleChange}
-                    placeholder="Any specific concerns or areas to focus on?"
-                    rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Confirm */}
-            {step === 3 && (
-              <div className="space-y-6 animate-fadeInUp">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Confirm Your Request</h2>
-
-                <div className="bg-primary-50 rounded-lg p-6 space-y-3">
-                  {[
-                    ['Boat', formData.boatName || '—'],
-                    ['Type', formData.boatType],
-                    ['Year', formData.boatYear || '—'],
-                    ['Inspection', inspectionTypes.find((t) => t.value === formData.inspectionType)?.label ?? formData.inspectionType],
-                    ['Location', formData.location || '—'],
-                    ['Preferred Date', formData.preferredDate || '—'],
-                  ].map(([label, value]) => (
-                    <div key={label} className="flex justify-between">
-                      <span className="text-gray-700 font-medium">{label}:</span>
-                      <span className="font-semibold text-gray-900">{value}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <p className="text-sm text-gray-600">
-                  By submitting this request, you agree to our terms of service. We&apos;ll confirm
-                  your inspection within 24 hours.
-                </p>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-60"
-                >
-                  {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {loading ? 'Submitting…' : 'Submit Inspection Request'}
-                </button>
-              </div>
-            )}
-
-            {/* Navigation */}
-            <div className="flex gap-4 mt-8">
-              {step > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setStep(step - 1)}
-                  className="btn-outline flex-1"
-                >
-                  Back
-                </button>
               )}
-              {step < 3 && (
-                <button
-                  type="button"
-                  onClick={() => setStep(step + 1)}
-                  className="btn-primary flex-1 flex items-center justify-center gap-2"
-                >
-                  Next <ChevronRight className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </form>
+
+              {/* Navigation */}
+              <div className="flex gap-3 mt-6">
+                {step > 1 && (
+                  <button type="button" onClick={() => setStep(step - 1)} className="btn btn-outline flex-1">
+                    {t.request.back}
+                  </button>
+                )}
+                {step < 3 && (
+                  <button type="button" onClick={() => setStep(step + 1)} className="btn btn-primary flex-1 gap-2">
+                    {t.request.next} <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
