@@ -99,20 +99,20 @@ export default function LoginPage() {
             {/* OAuth buttons */}
             <div className="space-y-3 mb-6">
               <p className="text-center text-sm text-base-content/50">{t.auth.login.orWith}</p>
-              <div className="grid grid-cols-3 gap-2">
-                <button type="button" onClick={() => window.location.href = '/api/auth/signin/google'} className="btn btn-outline gap-2 text-sm">
+              <div className="flex flex-col gap-2">
+                <button type="button" onClick={() => window.location.href = '/api/auth/signin/google'} className="btn btn-outline gap-2 w-full text-sm">
                   <GoogleIcon />Google
                 </button>
-                <button type="button" onClick={() => window.location.href = '/api/auth/signin/facebook'} className="btn btn-outline gap-2 text-sm">
+                <button type="button" onClick={() => window.location.href = '/api/auth/signin/facebook'} className="btn btn-outline gap-2 w-full text-sm">
                   <FacebookIcon />Facebook
                 </button>
-                <button type="button" onClick={() => window.location.href = '/api/auth/signin/azure-ad'} className="btn btn-outline gap-2 text-sm">
+                <button type="button" onClick={() => window.location.href = '/api/auth/signin/azure-ad'} className="btn btn-outline gap-2 w-full text-sm">
                   <MicrosoftIcon />Microsoft
                 </button>
+                <button type="button" onClick={() => window.location.href = '/api/auth/signin/apple'} className="btn btn-outline gap-2 w-full text-sm">
+                  <AppleIcon />Apple
+                </button>
               </div>
-              <button type="button" onClick={() => window.location.href = '/api/auth/signin/apple'} className="btn btn-outline gap-2 w-full text-sm">
-                <AppleIcon />Apple
-              </button>
             </div>
 
             <div className="divider text-xs text-base-content/40">Email</div>
