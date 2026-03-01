@@ -2,28 +2,22 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X, LogOut, LayoutDashboard, ChevronDown, Palette } from 'lucide-react'
+import { Menu, X, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { useTheme, Theme } from '@/context/ThemeContext'
 import BrandIcon from '@/components/BrandIcon'
 import { Language, languageNames } from '@/i18n'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
-  const [themeOpen, setThemeOpen] = useState(false)
   const { user, isAuthenticated, logout } = useAuth()
   const { lang, setLang, t } = useLanguage()
-  const { theme, setTheme, themes } = useTheme()
   const langRef = useRef<HTMLDivElement>(null)
-  const themeRef = useRef<HTMLDivElement>(null)
 
-  // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false)
-      if (themeRef.current && !themeRef.current.contains(e.target as Node)) setThemeOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -39,10 +33,6 @@ export default function Navbar() {
   const initials = user
     ? `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase()
     : ''
-
-  const themeLabels: Record<Theme, string> = {
-    light: '☀️', dark: '🌙', cupcake: '🧁', business: '💼', cyberpunk: '⚡', forest: '🌲',
-  }
 
   return (
     <nav className="fixed top-0 w-full bg-base-100/80 backdrop-blur-md z-50 border-b border-base-300">
@@ -74,7 +64,7 @@ export default function Navbar() {
             {/* Language selector */}
             <div className="relative" ref={langRef}>
               <button
-                onClick={() => { setLangOpen(!langOpen); setThemeOpen(false) }}
+                onClick={() => setLangOpen(!langOpen)}
                 className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-base-content/70 hover:text-primary hover:bg-base-200 transition-colors"
               >
                 {languageNames[lang]}
@@ -89,33 +79,6 @@ export default function Navbar() {
                       className={`w-full text-left px-4 py-2 text-sm hover:bg-base-200 transition-colors ${lang === l ? 'text-primary font-bold' : 'text-base-content'}`}
                     >
                       {languageNames[l]}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Theme selector */}
-            <div className="relative" ref={themeRef}>
-              <button
-                onClick={() => { setThemeOpen(!themeOpen); setLangOpen(false) }}
-                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-base-content/70 hover:text-primary hover:bg-base-200 transition-colors"
-                title={t.theme.label}
-              >
-                <Palette className="w-4 h-4" />
-                <span className="text-xs">{themeLabels[theme]}</span>
-                <ChevronDown className={`w-3 h-3 transition-transform ${themeOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {themeOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-base-100 border border-base-300 rounded-xl shadow-xl z-50 overflow-hidden">
-                  {themes.map((th) => (
-                    <button
-                      key={th}
-                      onClick={() => { setTheme(th); setThemeOpen(false) }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-base-200 transition-colors flex items-center gap-2 ${theme === th ? 'text-primary font-bold' : 'text-base-content'}`}
-                    >
-                      <span>{themeLabels[th]}</span>
-                      {t.theme.themes[th]}
                     </button>
                   ))}
                 </div>
@@ -189,18 +152,6 @@ export default function Navbar() {
                   className={`px-2 py-1 text-xs rounded-lg border ${lang === l ? 'border-primary text-primary font-bold' : 'border-base-300 text-base-content/60'}`}
                 >
                   {languageNames[l]}
-                </button>
-              ))}
-            </div>
-            {/* Mobile theme */}
-            <div className="flex gap-2 mt-2 flex-wrap">
-              {themes.map((th) => (
-                <button
-                  key={th}
-                  onClick={() => setTheme(th)}
-                  className={`px-2 py-1 text-xs rounded-lg border ${theme === th ? 'border-primary text-primary font-bold' : 'border-base-300 text-base-content/60'}`}
-                >
-                  {themeLabels[th]} {t.theme.themes[th]}
                 </button>
               ))}
             </div>
