@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="7" fill="#0EA5E9"/>
+  <!-- Mast -->
+  <rect x="14.5" y="4" width="2" height="14" rx="1" fill="white"/>
+  <!-- Main sail -->
+  <path d="M16.5 5 L27 17 H16.5 Z" fill="white" opacity="0.92"/>
+  <!-- Hull -->
+  <path d="M5 18.5 H27 L24 24.5 Q16 28 8 24.5 Z" fill="white"/>
+  <!-- Checkmark (left side) -->
+  <path d="M4.5 11 L7.5 14 L12.5 8" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.82"/>
+</svg>
