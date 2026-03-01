@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X, Anchor, LogOut, LayoutDashboard, ChevronDown, Palette } from 'lucide-react'
+import { Menu, X, LogOut, LayoutDashboard, ChevronDown, Palette } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme, Theme } from '@/context/ThemeContext'
+import BrandIcon from '@/components/BrandIcon'
 import { Language, languageNames } from '@/i18n'
 
 export default function Navbar() {
@@ -50,7 +51,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-bold text-2xl">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-              <Anchor className="w-6 h-6 text-primary-content" />
+              <BrandIcon className="w-6 h-6 text-primary-content" />
             </div>
             <span className="gradient-text">CheckThatBoat</span>
           </Link>
