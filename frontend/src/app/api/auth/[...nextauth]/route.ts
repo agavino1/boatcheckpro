@@ -1,26 +1,49 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import GitHubProvider from 'next-auth/providers/github'
+import FacebookProvider from 'next-auth/providers/facebook'
+import AzureADProvider from 'next-auth/providers/azure-ad'
+import AppleProvider from 'next-auth/providers/apple'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
+const providers = [
+  GoogleProvider({
+    clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+  }),
+  GitHubProvider({
+    clientId: process.env.GITHUB_CLIENT_ID ?? '',
+    clientSecret: process.env.GITHUB_CLIENT_SECRET ?? '',
+  }),
+  ...(process.env.FACEBOOK_CLIENT_ID ? [
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET ?? '',
+    }),
+  ] : []),
+  ...(process.env.AZURE_AD_CLIENT_ID ? [
+    AzureADProvider({
+      clientId: process.env.AZURE_AD_CLIENT_ID,
+      clientSecret: process.env.AZURE_AD_CLIENT_SECRET ?? '',
+      tenantId: process.env.AZURE_AD_TENANT_ID ?? 'common',
+    }),
+  ] : []),
+  ...(process.env.APPLE_ID ? [
+    AppleProvider({
+      clientId: process.env.APPLE_ID,
+      clientSecret: process.env.APPLE_SECRET ?? '',
+    }),
+  ] : []),
+]
+
 const handler = NextAuth({
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID ?? '',
-      clientSecret: process.env.GITHUB_CLIENT_SECRET ?? '',
-    }),
-  ],
+  providers,
   secret: process.env.NEXTAUTH_SECRET ?? 'change-me-in-production',
   callbacks: {
     async signIn({ user, account }) {
       if (!account || !user.email) return false
       try {
-        // Exchange OAuth token for our own JWT
         const res = await fetch(`${API_URL}/api/auth/oauth`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -33,7 +56,6 @@ const handler = NextAuth({
         })
         if (!res.ok) return false
         const data = await res.json()
-        // Store our JWT in the session token
         ;(user as any).appToken = data.token
         ;(user as any).appUser = data.user
         return true
