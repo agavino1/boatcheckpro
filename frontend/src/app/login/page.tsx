@@ -106,12 +106,6 @@ export default function LoginPage() {
                 <button type="button" onClick={() => window.location.href = '/api/auth/signin/facebook'} className="btn btn-outline gap-2 w-full text-sm">
                   <FacebookIcon />Facebook
                 </button>
-                <button type="button" onClick={() => window.location.href = '/api/auth/signin/azure-ad'} className="btn btn-outline gap-2 w-full text-sm">
-                  <MicrosoftIcon />Microsoft
-                </button>
-                <button type="button" onClick={() => window.location.href = '/api/auth/signin/apple'} className="btn btn-outline gap-2 w-full text-sm">
-                  <AppleIcon />Apple
-                </button>
               </div>
             </div>
 
